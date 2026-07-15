@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AnalogAssist — IC Design Copilot</title>
+  <style>
+    :root { --ink:#eaf1ff; --muted:#94a3bd; --line:rgba(154,180,230,.16); --panel:rgba(13,24,47,.77); --navy:#071226; --blue:#5da9ff; --cyan:#50e3d0; --user:#1e63ba; }
+    * { box-sizing:border-box; } body { margin:0; min-height:100vh; color:var(--ink); font:15px/1.5 Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, sans-serif; background:var(--navy); overflow-x:hidden; }
+    body:before, body:after { content:""; position:fixed; z-index:-1; border-radius:50%; filter:blur(5px); opacity:.52; }
+    body:before { width:520px;height:520px; background:#123c86; top:-210px;right:-80px; } body:after { width:460px;height:460px; background:#0d625f; bottom:-270px;left:-150px; }
+    .app { display:grid; grid-template-columns:260px minmax(0,1fr); max-width:1440px; min-height:100vh; margin:auto; background:linear-gradient(125deg,rgba(7,18,38,.7),rgba(8,19,40,.38)); }
+    aside { border-right:1px solid var(--line); padding:26px 16px; background:rgba(5,14,30,.5); display:flex; flex-direction:column; gap:22px; }
+    .brand { display:flex; align-items:center; gap:11px; padding:0 8px; font-size:17px; font-weight:750; letter-spacing:-.3px; } .chip { width:31px;height:31px; display:grid;place-items:center; color:#07213d; background:linear-gradient(135deg,var(--cyan),var(--blue)); border-radius:9px; font-weight:900; box-shadow:0 0 24px rgba(80,227,208,.3); }
+    .new { border:1px solid rgba(93,169,255,.55); color:#eaf4ff; background:rgba(35,90,169,.2); border-radius:10px; padding:11px 12px; text-align:left; cursor:pointer; font:inherit; transition:.2s; } .new:hover { background:rgba(56,120,211,.35); transform:translateY(-1px); }
+    .section-label { color:#7789a8; font-size:11px; letter-spacing:.11em; text-transform:uppercase; margin:5px 8px 0; } .history { display:grid; gap:4px; } .history button { color:#9fb0ca; border:0;background:transparent;text-align:left;border-radius:8px;padding:8px;cursor:pointer;font:13px inherit; white-space:nowrap;overflow:hidden;text-overflow:ellipsis; } .history button:hover,.history button.active { background:rgba(116,150,206,.12);color:#f1f6ff; }
+    .profile { margin-top:auto; display:flex; gap:9px; align-items:center; border-top:1px solid var(--line); padding:17px 7px 0; color:#9fb0ca; font-size:12px; } .avatar { width:29px;height:29px;border-radius:50%;display:grid;place-items:center;background:#264b78;color:#dbeaff;font-size:12px;font-weight:700; }
+    main { display:flex; flex-direction:column; min-width:0; height:100vh; } header { height:78px; flex:none; display:flex;align-items:center;justify-content:space-between;padding:0 38px;border-bottom:1px solid var(--line); } header h1 { margin:0;font-size:15px;font-weight:650; } header p { margin:2px 0 0;color:var(--muted);font-size:12px; } .status { display:flex;gap:8px;align-items:center;color:#aad4cc;font-size:12px; }.dot{width:8px;height:8px;background:#45dcac;border-radius:50%;box-shadow:0 0 10px #45dcac;}
+    .chat { width:min(880px,100%); margin:0 auto; padding:48px 32px 22px; flex:1; overflow:auto; } .welcome { margin-bottom:34px; }.eyebrow{color:var(--cyan);font-size:11px;letter-spacing:.16em;text-transform:uppercase;font-weight:700;}.welcome h2{font-size:36px;line-height:1.18;letter-spacing:-1.1px;margin:11px 0 9px;max-width:610px;}.welcome p{margin:0;color:#a7b5cc;max-width:600px;}
+    .suggestions { display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:27px 0 36px;}.suggestion{border:1px solid var(--line);background:rgba(23,42,75,.47);border-radius:12px;padding:13px 14px;color:#c9d7ed;cursor:pointer;text-align:left;font:13px/1.35 inherit;transition:.2s;}.suggestion small{display:block;color:#7fa5d7;margin-bottom:5px;font-size:11px;}.suggestion:hover{border-color:rgba(93,169,255,.7);background:rgba(31,70,127,.6);transform:translateY(-2px);}
+    .message{display:flex;gap:12px;margin:19px 0;animation:appear .28s ease both;}.message .bubble{max-width:760px;padding:13px 16px;border-radius:4px 14px 14px 14px;background:var(--panel);border:1px solid var(--line);color:#dce7f8;}.message.user{justify-content:flex-end;}.message.user .bubble{background:linear-gradient(135deg,#194a91,#276fc7);border-color:rgba(123,186,255,.33);border-radius:14px 4px 14px 14px;color:white;}.boticon{width:30px;height:30px;flex:none;border-radius:8px;display:grid;place-items:center;background:linear-gradient(135deg,var(--cyan),var(--blue));color:#06213c;font-weight:900;font-size:12px;}.bubble strong{color:white;}.typing{color:#9db1cf;font-size:13px;font-style:italic;}
+    form { width:min(880px,100%); margin:0 auto; padding:12px 32px 28px;position:relative; }.input-wrap { display:flex;align-items:end;gap:10px;padding:8px 9px 8px 16px;border:1px solid rgba(126,159,211,.35);border-radius:14px;background:rgba(7,18,38,.83);box-shadow:0 12px 35px rgba(0,0,0,.18); }.input-wrap:focus-within {border-color:var(--blue);box-shadow:0 0 0 3px rgba(93,169,255,.12);} textarea {resize:none;border:0;outline:0;background:transparent;color:#eaf1ff;font:14px/1.45 inherit;min-height:25px;max-height:140px;flex:1;padding:4px 0;}textarea::placeholder{color:#71829e;} .attach { border:0;background:transparent;color:#8fb1e3;width:31px;height:35px;cursor:pointer;font-size:19px;border-radius:7px; }.attach:hover{background:rgba(93,169,255,.14);color:#d9eaff}.send {border:0;background:linear-gradient(135deg,var(--cyan),var(--blue));color:#07213d;width:38px;height:38px;border-radius:10px;font-size:18px;font-weight:900;cursor:pointer;transition:.2s;}.send:hover{filter:brightness(1.1);transform:scale(1.04)}.hint{text-align:center;color:#61718c;font-size:11px;margin:9px 0 0;} .attachments { display:flex;flex-wrap:wrap;gap:7px;margin:0 0 8px;}.file-pill { display:flex;align-items:center;gap:7px;padding:7px 8px 7px 10px;color:#cbdcf5;background:rgba(35,81,144,.4);border:1px solid rgba(104,165,247,.38);border-radius:8px;font-size:12px;}.file-pill b{color:#76dccc;font-size:10px;letter-spacing:.04em}.file-pill button{border:0;background:transparent;color:#a9bedf;cursor:pointer;font-size:16px;line-height:1;padding:0 0 1px 3px}.file-card{display:flex;gap:10px;align-items:center;background:rgba(37,82,144,.36);border:1px solid rgba(115,168,245,.25);border-radius:9px;padding:9px 11px;margin-top:9px;font-size:12px;color:#bdd2f1}.file-card i{font-style:normal;background:#cf4d62;color:white;border-radius:5px;padding:3px 4px;font-size:9px;font-weight:800}.file-card span{color:#829bbb;font-size:11px}
+    @keyframes appear {from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}} @media(max-width:700px){.app{grid-template-columns:1fr}aside{display:none}header{padding:0 20px}.chat{padding:30px 20px 10px}.welcome h2{font-size:29px}.suggestions{grid-template-columns:1fr}form{padding:12px 20px 20px}.status{display:none}}
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside>
+      <div class="brand"><span class="chip">A</span> AnalogAssist</div>
+      <button class="new" id="newChat">＋ New design question</button>
+      <div class="section-label">Recent discussions</div>
+      <div class="history"><button class="active">Current-mirror mismatch</button><button>Telescopic OTA gain</button><button>Phase margin at 1.8 V</button><button>Noise in common-source LNA</button></div>
+      <div class="profile"><span class="avatar">IC</span><span><strong style="color:#dce8fc">Design workspace</strong><br>Analog IC engineer</span></div>
+    </aside>
+    <main>
+      <header><div><h1>Analog IC Design Copilot</h1><p>Concepts, calculations, and design reviews</p></div><div class="status"><span class="dot"></span> Ready to help</div></header>
+      <section class="chat" id="chat">
+        <div class="welcome" id="welcome"><div class="eyebrow">AnalogAssist</div><h2>What are you designing today?</h2><p>Ask about circuits, device physics, layout, simulations, or trade-offs. I’ll help you reason from the spec to the silicon.</p></div>
+        <div class="suggestions" id="suggestions">
+          <button class="suggestion"><small>Biasing</small>How do I size a current mirror for 20 µA?</button>
+          <button class="suggestion"><small>Stability</small>Why is my two-stage op-amp unstable?</button>
+          <button class="suggestion"><small>Layout</small>How can I reduce mismatch in a differential pair?</button>
+          <button class="suggestion"><small>Noise</small>Which device region gives the best input-referred noise?</button>
+        </div>
+      </section>
+      <form id="chatForm"><input id="fileInput" type="file" accept=".pdf,.txt,.csv,.png,.jpg,.jpeg" multiple hidden><div class="attachments" id="attachments"></div><div class="input-wrap"><button class="attach" id="attach" type="button" aria-label="Attach PDF or file" title="Attach PDF, image, or text file">⌕</button><textarea id="prompt" rows="1" placeholder="Ask an analog IC design question…" autofocus></textarea><button class="send" aria-label="Send question">↑</button></div><p class="hint">Attach PDFs, simulation plots, or notes. Verify final choices with simulations and PDK rules.</p></form>
+    </main>
+  </div>
+  <script>
+    const chat = document.getElementById('chat'), prompt = document.getElementById('prompt'), form = document.getElementById('chatForm'), fileInput=document.getElementById('fileInput'), attachments=document.getElementById('attachments'); let files=[];
+    const replies = [
+      ['current mirror','For a current mirror, begin with the required current ratio: <strong>I<sub>OUT</sub>/I<sub>REF</sub> = (W/L)<sub>OUT</sub>/(W/L)<sub>REF</sub></strong>. Keep both devices in saturation, use a sufficiently long L to improve matching and output resistance, then check V<sub>DS</sub> headroom across PVT. Would you like to work from your supply voltage, process node, and current target?'],
+      ['unstable','Instability usually means the loop reaches 0 dB before enough phase margin is accumulated. First plot loop gain and target 60–70° phase margin. In a two-stage op-amp, use Miller compensation to create a dominant pole and consider a series nulling resistor if the RHP zero is hurting phase. Then sweep load capacitance, process, supply, and temperature.'],
+      ['mismatch','For a differential pair, use <strong>common-centroid placement</strong>, identical orientation, interdigitation, dummies, and symmetric routing. Make devices large enough for the mismatch budget; random offset roughly scales as 1/√(WL). Also shield sensitive nodes and keep local gradients (temperature, stress, well proximity) symmetric.'],
+      ['noise','For MOS input devices, thermal noise and 1/f noise compete. Larger area reduces flicker noise; strong or moderate inversion can improve gm for a given current, lowering thermal input-referred noise. The best region depends on bandwidth, power, corner frequency, and source impedance — start by comparing input-referred PSD in your PDK noise simulation.'],
+      ['default','A good way to approach this is to pin down the <strong>specification, operating region, and worst-case corners</strong>. Share your topology, VDD, target current/bandwidth/gain, and any simulation plot or error message, and I’ll help turn it into a concrete sizing and verification plan.']
+    ];
+    function add(kind, html) { const m=document.createElement('div');m.className='message '+kind;m.innerHTML=kind==='user'?`<div class="bubble"></div>`:`<div class="boticon">A</div><div class="bubble"></div>`;m.querySelector('.bubble').innerHTML=html;chat.appendChild(m);chat.scrollTop=chat.scrollHeight;return m; }
+    function answer(q){ const x=q.toLowerCase(); const match=replies.find(([key])=>key!=='default'&&x.includes(key))||replies.at(-1); const t=add('bot','<span class="typing">Thinking through the design…</span>'); setTimeout(()=>{t.querySelector('.bubble').innerHTML=match[1];chat.scrollTop=chat.scrollHeight},500); }
+    function esc(s){return s.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]))} function renderFiles(){attachments.innerHTML=files.map((f,i)=>`<div class="file-pill"><b>${f.name.split('.').pop().toUpperCase()}</b>${esc(f.name)}<button type="button" onclick="removeFile(${i})">×</button></div>`).join('')} window.removeFile=i=>{files.splice(i,1);renderFiles()}
+    function ask(q){ q=q.trim();if(!q&&!files.length)return; document.getElementById('welcome')?.remove();document.getElementById('suggestions')?.remove();let body=q?esc(q):'Please review the attached design material.';if(files.length){body+=files.map(f=>`<div class="file-card"><i>${f.name.split('.').pop().toUpperCase()}</i><div>${esc(f.name)}<br><span>${(f.size/1024).toFixed(1)} KB attached for review</span></div></div>`).join('');}add('user',body);const fileNames=files.map(f=>f.name).join(', ');prompt.value='';prompt.style.height='auto';files=[];renderFiles();answer(q||('Review '+fileNames)); }
+    form.addEventListener('submit',e=>{e.preventDefault();ask(prompt.value)});document.getElementById('attach').onclick=()=>fileInput.click();fileInput.addEventListener('change',e=>{files.push(...[...e.target.files].filter(f=>!files.some(x=>x.name===f.name&&x.size===f.size)));renderFiles();fileInput.value=''});prompt.addEventListener('input',()=>{prompt.style.height='auto';prompt.style.height=Math.min(prompt.scrollHeight,140)+'px'});prompt.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();form.requestSubmit()}});document.querySelectorAll('.suggestion').forEach(b=>b.onclick=()=>ask(b.textContent.trim().replace(/^(Biasing|Stability|Layout|Noise)/,'')));document.getElementById('newChat').onclick=()=>location.reload();
+    // Replace the demo responder with the document-aware server endpoint.
+    ask = async function(q) {
+      q=q.trim(); if(!q&&!files.length)return;
+      document.getElementById('welcome')?.remove(); document.getElementById('suggestions')?.remove();
+      let body=q?esc(q):'Please review the attached design material.';
+      if(files.length) body+=files.map(f=>`<div class="file-card"><i>${f.name.split('.').pop().toUpperCase()}</i><div>${esc(f.name)}<br><span>${(f.size/1024).toFixed(1)} KB attached for review</span></div></div>`).join('');
+      add('user',body); const uploadBatch=[...files]; files=[]; renderFiles(); prompt.value=''; prompt.style.height='auto';
+      const pending=add('bot','<span class="typing">Reviewing your question and attachment…</span>');
+      try { const data=new FormData(); data.append('question',q); uploadBatch.forEach(f=>data.append('files',f)); const res=await fetch('/api/chat',{method:'POST',body:data}); const out=await res.json(); if(!res.ok)throw Error(out.error||'Request failed'); pending.querySelector('.bubble').textContent=out.reply; }
+      catch(err) { pending.querySelector('.bubble').innerHTML=`<strong>Couldn’t reach the AI service.</strong><br>${esc(err.message)}<br><br>Run <code>python server.py</code> and add your API key to <code>.env</code>.`; }
+      chat.scrollTop=chat.scrollHeight;
+    };
+  </script>
+</body>
+</html>
