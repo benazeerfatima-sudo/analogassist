@@ -1,15 +1,13 @@
-# AnalogAssist
+# StudySupport
 
-A local, document-aware analog IC design chatbot. Your API key remains on the server, not in the browser.
+Hosted student support with photo questions, AI explanations, and a teacher dashboard.
 
-## Run
+## Deploy
 
-1. Install Python 3.10+.
-2. In this folder, run `python -m pip install -r requirements.txt`.
-3. Copy `.env.example` to `.env` and add your OpenAI API key.
-4. Run `python server.py`.
-5. Browse to `http://127.0.0.1:8000`.
+1. Create a Supabase project and run `supabase/schema.sql` in its SQL Editor.
+2. Import this repository into Vercel.
+3. Add the values from `.env.local.example` in Vercel's environment variables.
+4. Add the OpenAI key only to Vercel, never to GitHub or browser code.
+5. Deploy to receive a permanent public link.
 
-It accepts up to four PDF, TXT, CSV, LOG, or MD files (10 MB each). Scanned PDFs need OCR first.
-
-For public deployment, add authentication, rate limiting, moderation, privacy controls, and HTTPS.
+The starter includes a working AI image-question endpoint and teacher dashboard UI. Connect Supabase Auth, database, and Storage before inviting students.
